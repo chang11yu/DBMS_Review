@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>資料庫期中複習筆記</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@700&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d2e;
+    --surface2: #242740;
+    --accent: #7c6af7;
+    --accent2: #56cfb2;
+    --accent3: #f7a04a;
+    --accent4: #f76a8a;
+    --text: #e2e4f0;
+    --text-muted: #8b8fad;
+    --border: #2e3255;
+    --code-bg: #13162a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    padding: 60px 0 50px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 50px;
+  }
+
+  .subject-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 48px);
+    background: linear-gradient(135deg, #7c6af7, #56cfb2, #f7a04a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  /* TOC */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 50px;
+  }
+
+  .toc h2 {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 16px;
+  }
+
+  .toc-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+    list-style: none;
+  }
+
+  .toc-list a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+    font-size: 14px;
+  }
+
+  .toc-list a:hover {
+    background: var(--surface2);
+    color: var(--accent);
+  }
+
+  .toc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    width: 20px;
+    flex-shrink: 0;
+  }
+
+  /* CHAPTER SECTIONS */
+  .chapter {
+    margin-bottom: 64px;
+  }
+
+  .chapter-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ch-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  .chapter h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+  }
+
+  /* COLOR CODING PER CHAPTER */
+  .chapter:nth-child(1) .chapter h2, .chapter:nth-child(1) .ch-num { color: var(--accent); }
+  .ch1 .bar { background: var(--accent); }
+  .ch2 .bar { background: var(--accent2); }
+  .ch3 .bar { background: var(--accent3); }
+  .ch4 .bar { background: var(--accent4); }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 26px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+  }
+
+  .ch1 .card::before { background: var(--accent); }
+  .ch2 .card::before { background: var(--accent2); }
+  .ch3 .card::before { background: var(--accent3); }
+  .ch4 .card::before { background: var(--accent4); }
+
+  .card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card h3 .icon {
+    font-size: 16px;
+  }
+
+  .card p, .card li {
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .card ul, .card ol {
+    padding-left: 20px;
+    margin-top: 6px;
+  }
+
+  .card li {
+    margin-bottom: 4px;
+  }
+
+  /* DEFINITION HIGHLIGHT */
+  .def {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 10px;
+    font-size: 13px;
+  }
+
+  .def .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  /* CODE / FORMULA */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 2px 8px;
+    font-size: 13px;
+    color: var(--accent2);
+  }
+
+  pre {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 13px;
+    overflow-x: auto;
+    margin-top: 12px;
+    line-height: 1.6;
+    color: var(--accent2);
+  }
+
+  /* TAGS */
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin: 2px;
+  }
+
+  .tag-warn { background: rgba(247,160,74,0.15); color: var(--accent3); border: 1px solid rgba(247,160,74,0.3); }
+  .tag-key { background: rgba(124,106,247,0.15); color: var(--accent); border: 1px solid rgba(124,106,247,0.3); }
+  .tag-exam { background: rgba(247,106,138,0.15); color: var(--accent4); border: 1px solid rgba(247,106,138,0.3); }
+
+  /* GRID LAYOUT */
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 640px) {
+    .grid2 { grid-template-columns: 1fr; }
+  }
+
+  /* TABLE */
+  .table-wrap {
+    overflow-x: auto;
+    margin-top: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  th {
+    background: var(--surface2);
+    padding: 10px 14px;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  td {
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  tr:hover td { background: var(--surface2); }
+
+  /* CALLOUT */
+  .callout {
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 14px;
+    display: flex;
+    gap: 12px;
+  }
+
+  .callout-warn { background: rgba(247,160,74,0.1); border-left: 3px solid var(--accent3); }
+  .callout-tip { background: rgba(86,207,178,0.1); border-left: 3px solid var(--accent2); }
+  .callout-exam { background: rgba(247,106,138,0.1); border-left: 3px solid var(--accent4); }
+
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+  /* NF VISUAL */
+  .nf-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .nf-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .nf-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 6px;
+    min-width: 60px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .nf-1 { background: rgba(124,106,247,0.2); color: var(--accent); }
+  .nf-2 { background: rgba(86,207,178,0.2); color: var(--accent2); }
+  .nf-3 { background: rgba(247,160,74,0.2); color: var(--accent3); }
+  .nf-bcnf { background: rgba(247,106,138,0.2); color: var(--accent4); }
+
+  .nf-arrow { color: var(--text-muted); font-size: 18px; }
+  .nf-desc { font-size: 13px; color: var(--text-muted); }
+
+  /* RULE BOX */
+  .rule-box {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-top: 10px;
+  }
+
+  .rule-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  /* DIAGRAM HINT */
+  .diagram-hint {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--text-muted);
+    border: 1px dashed var(--border);
+    margin-top: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.9;
+  }
+
+  /* Section spacer */
+  .section-spacer {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+    margin: 30px 0;
+  }
+
+  /* HIGHLIGHT */
+  mark {
+    background: rgba(124,106,247,0.25);
+    color: var(--accent);
+    border-radius: 3px;
+    padding: 0 4px;
+  }
+
+  strong { color: #fff; }
+
+  em { color: var(--accent2); font-style: normal; font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="subject-tag">MIDTERM REVIEW · 資料庫系統</div>
+    <h1>期中考<br>完整複習筆記</h1>
+    <p class="subtitle">National Chiayi University · MIS · Yen-Hsien Lee</p>
+  </header>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h2>// 目錄</h2>
+    <ul class="toc-list">
+      <li><a href="#ch1"><span class="toc-num">01</span>資料庫概念</a></li>
+      <li><a href="#ch2"><span class="toc-num">02</span>ER 模型</a></li>
+      <li><a href="#ch3"><span class="toc-num">03</span>關聯式資料模型</a></li>
+      <li><a href="#ch4"><span class="toc-num">04</span>ER → 關聯轉換規則</a></li>
+      <li><a href="#ch5"><span class="toc-num">05</span>正規化 Normalization</a></li>
+      <li><a href="#ch6"><span class="toc-num">06</span>考古題整理</a></li>
+    </ul>
+  </div>
+
+
+  <!-- ======================= CH1 ======================= -->
+  <section class="chapter ch1" id="ch1">
+    <div class="chapter-header">
+      <span class="ch-num">CHAPTER 01</span>
+      <h2>資料庫概念 &amp; 系統架構</h2>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">⚠️</span>傳統檔案系統的問題</h3>
+      <ul>
+        <li><strong>Data Redundancy（資料重複）</strong>：同樣的資料存在多個檔案，浪費空間且容易不一致</li>
+        <li><strong>Data Isolation（資料孤立）</strong>：不同程式的檔案格式各異，新程式難以讀取舊資料</li>
+        <li><strong>Concurrent Access 問題</strong>：多人同時讀寫同一檔案 → 可能產生 Dirty Reads、Phantom Reads 等</li>
+        <li><strong>Security Problem</strong>：程式可任意存取檔案，無法細粒度控制</li>
+        <li><strong>Integrity Problem</strong>：難以確保資料正確與一致</li>
+        <li><strong>Data/Program Dependency</strong>：資料格式改變時，所有程式都要跟著改</li>
+      </ul>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3><span class="icon">🗄️</span>Database 定義</h3>
+        <p>代表真實世界某部分（Universe of Discourse），由<strong>自描述（Self-describing）</strong>的相關整合資料集合組成，供多個應用程式共用。</p>
+        <div class="def">
+          <div class="label">關鍵詞</div>
+          <code>Self-describing</code> = 包含資料本身 + Metadata（描述結構）<br>
+          <code>Integrated</code> = 消除重複，統一格式<br>
+          <code>Shared</code> = 多程式共用
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="icon">📋</span>Schema vs Instance</h3>
+        <p><strong>Schema（Metadata）</strong>：資料庫的「描述」，包括欄位名稱、型別、關係、限制等。<em>不常改變。</em></p>
+        <p style="margin-top:8px"><strong>Instance（Database State）</strong>：某一時刻資料庫中的實際資料。<em>經常改變。</em></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">🏛️</span>ANSI/SPARC 三層架構</h3>
+      <div class="callout callout-exam">
+        <span class="callout-icon">⭐</span>
+        <div>這是很重要的考點！三層分別是什麼、各層的 Schema 名稱、以及兩種 Data Independence。</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <tr><th>層次</th><th>名稱</th><th>說明</th><th>Schema</th></tr>
+          <tr>
+            <td><span class="tag tag-key">External</span></td>
+            <td>個人使用者視角</td>
+            <td>每個使用者/程式看到的部分資料（View）</td>
+            <td>External Schema（可多個）</td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-key">Conceptual</span></td>
+            <td>社群整體視角</td>
+            <td>整個資料庫的邏輯結構，獨立於儲存細節</td>
+            <td>Conceptual Schema（只有一個）</td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-key">Internal</span></td>
+            <td>儲存實體視角</td>
+            <td>實際儲存方式（索引、存放格式等）</td>
+            <td>Internal Schema（只有一個）</td>
+          </tr>
+        </table>
+      </div>
+      <div class="grid2" style="margin-top:14px">
+        <div class="def">
+          <div class="label">Logical Data Independence</div>
+          改變 <strong>Conceptual Schema</strong> 而不需要改 External Schema / 應用程式
+        </div>
+        <div class="def">
+          <div class="label">Physical Data Independence</div>
+          改變 <strong>Internal Schema</strong> 而不需要改 Conceptual Schema
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">⚙️</span>DBMS 功能 &amp; 組件</h3>
+      <ul>
+        <li><strong>DDL（Data Definition Language）</strong>：定義/修改 Schema</li>
+        <li><strong>DML（Data Manipulation Language）</strong>：INSERT / UPDATE / DELETE / SELECT</li>
+        <li><strong>DCL（Data Control Language）</strong>：授權控制</li>
+      </ul>
+      <div class="callout callout-tip" style="margin-top:12px">
+        <span class="callout-icon">💡</span>
+        <div>DBMS 主要組件：Database Interface → Semantic Data Controller → Query Processor → Transaction Manager → Concurrency Control Scheduler → Recovery Manager → Data Manager → Catalog Manager</div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ======================= CH2 ======================= -->
+  <section class="chapter ch2" id="ch2">
+    <div class="chapter-header">
+      <span class="ch-num">CHAPTER 02</span>
+      <h2>Entity-Relationship (ER) 模型</h2>
+    </div>
+
+    <div class="callout callout-exam">
+      <span class="callout-icon">⭐</span>
+      <div><strong>本章是重點中的重點！</strong> 期中考有大量畫 ERD 的題目（Exercise #1~#6），要練熟所有概念的符號畫法。</div>
+    </div>
+
+    <!-- Symbols -->
+    <div class="card">
+      <h3><span class="icon">🎨</span>ER 圖常用符號總整理</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>符號</th><th>代表</th><th>說明</th></tr>
+          <tr><td><strong>矩形 □</strong></td><td>Entity Type</td><td>強實體型態（有自己的 Key）</td></tr>
+          <tr><td><strong>雙矩形 ▣</strong></td><td>Weak Entity Type</td><td>沒有自己的 Key，依賴 Owner</td></tr>
+          <tr><td><strong>菱形 ◇</strong></td><td>Association Relationship Type</td><td>一般關聯關係</td></tr>
+          <tr><td><strong>雙菱形 ◈</strong></td><td>Identifying Relationship</td><td>弱實體的識別關係</td></tr>
+          <tr><td><strong>橢圓 ○</strong></td><td>Attribute</td><td>一般屬性（single-valued）</td></tr>
+          <tr><td><strong>雙橢圓 ⊙</strong></td><td>Multi-valued Attribute</td><td>多值屬性（如電話、電郵）</td></tr>
+          <tr><td><strong>虛線橢圓</strong></td><td>Derived Attribute</td><td>可由其他屬性算出（如年齡）</td></tr>
+          <tr><td><strong>底線屬性</strong></td><td>Key Attribute</td><td>主鍵屬性</td></tr>
+          <tr><td><strong>虛線底線屬性</strong></td><td>Partial Key</td><td>弱實體的部分鍵</td></tr>
+          <tr><td><strong>IS-A 三角</strong></td><td>Specialization</td><td>繼承關係（超類→子類）</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Entity -->
+    <div class="grid2">
+      <div class="card">
+        <h3><span class="icon">📦</span>Entity 相關概念</h3>
+        <ul>
+          <li><strong>Entity</strong>：真實世界中可辨識的物體（人、公司、課程…）</li>
+          <li><strong>Entity Type</strong>：具相同屬性的 Entity 集合（如 EMPLOYEE）</li>
+          <li><strong>Weak Entity Type</strong>：沒有自己的 Key Attribute，需靠 Owner 實體 + Partial Key 識別</li>
+        </ul>
+        <div class="callout callout-warn" style="margin-top:10px">
+          <span class="callout-icon">⚠️</span>
+          <div>Weak Entity 一定有 Total Participation（完全參與）在識別關係中</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="icon">🔑</span>Key 種類</h3>
+        <ul>
+          <li><strong>Key Attribute</strong>：可唯一識別每個 Entity 的屬性</li>
+          <li><strong>Candidate Key</strong>：所有可能的 Key（可能有多個）</li>
+          <li><strong>Primary Key</strong>：從 Candidate Key 中選定的主鍵</li>
+          <li><strong>Secondary Key</strong>：未被選為 Primary Key 的其他 Candidate Key</li>
+          <li><strong>Partial Key</strong>：弱實體的部分識別屬性（虛線底線）</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Attributes -->
+    <div class="card">
+      <h3><span class="icon">🏷️</span>Attribute 類型</h3>
+      <div class="grid2">
+        <div>
+          <strong>Simple vs Composite</strong>
+          <ul style="margin-top:6px">
+            <li><em>Simple（原子屬性）</em>：不可再分割（如 SSN）</li>
+            <li><em>Composite（複合屬性）</em>：可分解成子屬性（如 Address → Street, City, State）</li>
+          </ul>
+        </div>
+        <div>
+          <strong>Single-valued vs Multi-valued</strong>
+          <ul style="margin-top:6px">
+            <li><em>Single-valued</em>：每個 Entity 只有一個值（如 Name）</li>
+            <li><em>Multi-valued</em>：可有多個值（如 Phone, Email）→ 畫雙橢圓</li>
+          </ul>
+        </div>
+        <div>
+          <strong>Stored vs Derived</strong>
+          <ul style="margin-top:6px">
+            <li><em>Stored</em>：直接儲存的屬性（如 BirthDate）</li>
+            <li><em>Derived</em>：可從其他屬性算出（如 Age）→ 畫虛線橢圓</li>
+          </ul>
+        </div>
+        <div>
+          <strong>Null Values</strong>
+          <ul style="margin-top:6px">
+            <li><em>Not Applicable</em>：此屬性不適用於此 Entity</li>
+            <li><em>Unknown</em>：不知道此屬性的值</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Relationship -->
+    <div class="card">
+      <h3><span class="icon">🔗</span>Relationship Type 概念</h3>
+      <div class="grid2">
+        <div>
+          <strong>Degree（度數）</strong>
+          <ul style="margin-top:6px">
+            <li><em>Unary（一元）</em>：同一 Entity Type 與自己關聯</li>
+            <li><em>Binary（二元）</em>：兩個 Entity Type（最常見）</li>
+            <li><em>Ternary（三元）</em>：三個 Entity Type</li>
+          </ul>
+        </div>
+        <div>
+          <strong>Cardinality（基數限制）</strong>
+          <ul style="margin-top:6px">
+            <li><em>1:1</em>：一對一</li>
+            <li><em>1:M</em>：一對多</li>
+            <li><em>M:M</em>：多對多</li>
+            <li>用 <code>(min, max)</code> 標記在各端</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout callout-tip" style="margin-top:12px">
+        <span class="callout-icon">💡</span>
+        <div><strong>如何看 (min, max)：</strong>某 Entity 最少參與幾次 / 最多幾次。例如 <code>(1,1)</code> = 剛好參與一次；<code>(0,N)</code> = 可以不參與，也可以參與多次。</div>
+      </div>
+    </div>
+
+    <!-- Specialization -->
+    <div class="card">
+      <h3><span class="icon">🌳</span>Specialization（泛化/特化）關係</h3>
+      <div class="grid2">
+        <div>
+          <strong>Disjointness Constraint（排斥性）</strong>
+          <ul style="margin-top:6px">
+            <li><em>Disjoint（D）</em>：每個 superclass entity 最多屬於一個 subclass</li>
+            <li><em>Overlapping（O）</em>：可同時屬於多個 subclass</li>
+          </ul>
+        </div>
+        <div>
+          <strong>Completeness Constraint（完整性）</strong>
+          <ul style="margin-top:6px">
+            <li><em>Total（T）</em>：每個 superclass entity 必屬於某個 subclass</li>
+            <li><em>Partial（P）</em>：superclass entity 可以不屬於任何 subclass</li>
+          </ul>
+        </div>
+      </div>
+      <div class="def">
+        <div class="label">組合標記</div>
+        <code>(D, P)</code> = Disjoint + Partial Coverage<br>
+        <code>(D, T)</code> = Disjoint + Total Coverage<br>
+        <code>(O, T)</code> = Overlapping + Total Coverage<br>
+        <code>(O, P)</code> = Overlapping + Partial Coverage
+      </div>
+    </div>
+
+    <!-- Key of relationship -->
+    <div class="card">
+      <h3><span class="icon">🔏</span>Relationship Type 的 Key</h3>
+      <ul>
+        <li>如果員工只能在同一個部門工作一次：Key = <code>Employee.SSN</code></li>
+        <li>如果員工可重複在同部門工作（需記歷史）：Key = <code>Employee.SSN + StartingDate</code></li>
+        <li>如果學生不能重複修同一門課：Key = <code>Student.SSN + Course.C-No</code></li>
+        <li>如果學生可重複修課（如補修）：Key = <code>Student.SSN + Course.C-No + Term</code></li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ======================= CH3 ======================= -->
+  <section class="chapter ch3" id="ch3">
+    <div class="chapter-header">
+      <span class="ch-num">CHAPTER 03</span>
+      <h2>關聯式資料模型 (Relational Data Model)</h2>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3><span class="icon">📊</span>基本概念</h3>
+        <ul>
+          <li><strong>Relation</strong>：二維表格</li>
+          <li><strong>Tuple（row）</strong>：一筆資料（一列）</li>
+          <li><strong>Attribute（column）</strong>：一個欄位（一行）</li>
+          <li><strong>Degree</strong>：屬性的數量（欄數）</li>
+          <li><strong>Cardinality</strong>：Tuple 的數量（列數）</li>
+          <li><strong>Domain</strong>：屬性的合法值域</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="icon">📐</span>Relation 的特性</h3>
+        <ul>
+          <li>每個 cell 只能有 <strong>single value</strong>（原子值）</li>
+          <li>每欄名稱唯一</li>
+          <li>同欄的值都來自同一個 Domain</li>
+          <li><strong>無重複的 Tuple</strong>（每列都不同）</li>
+          <li>欄的順序不重要</li>
+          <li>列的順序不重要</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">🔑</span>Primary Key &amp; Foreign Key</h3>
+      <div class="grid2">
+        <div>
+          <strong>Primary Key</strong>
+          <p style="margin-top:6px; font-size:13px">唯一識別每個 Tuple 的屬性（或屬性組合）。<strong>不可為 NULL</strong>（Entity Integrity）。</p>
+        </div>
+        <div>
+          <strong>Foreign Key</strong>
+          <p style="margin-top:6px; font-size:13px">引用另一個 Relation 的 Primary Key。其值必須存在於被引用的 Relation 中，或為 NULL（Referential Integrity）。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">⚖️</span>四種 Constraint</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Constraint</th><th>說明</th><th>違反範圍</th></tr>
+          <tr><td><code>Domain Constraint</code></td><td>值必須來自屬性的 Domain</td><td>單一屬性</td></tr>
+          <tr><td><code>Key Constraint</code></td><td>Relation 中不可有重複 Tuple</td><td>單一 Relation</td></tr>
+          <tr><td><code>Entity Integrity</code></td><td>Primary Key 不可為 NULL</td><td>單一 Relation</td></tr>
+          <tr><td><code>Referential Integrity</code></td><td>Foreign Key 值必須存在於被引用的 PK，或為 NULL</td><td>兩個 Relation 之間</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">🛠️</span>修改操作 (Modification Operations)</h3>
+      <div class="grid2">
+        <div>
+          <strong>INSERT</strong>
+          <p style="font-size:13px; margin-top:4px">可違反所有四種 Constraint</p>
+        </div>
+        <div>
+          <strong>DELETE</strong>
+          <p style="font-size:13px; margin-top:4px">只能違反 <em>Referential Integrity</em>（其他 Tuple 有 FK 指向被刪的）</p>
+          <p style="font-size:13px">處理選項：① Reject ② Cascade 刪除 ③ 設為 NULL</p>
+        </div>
+        <div>
+          <strong>UPDATE</strong>
+          <p style="font-size:13px; margin-top:4px">非 PK/FK 欄位 → 只能違反 Domain Constraint<br>更新 PK → 類似 Delete + Insert<br>更新 FK → 要確認新值存在</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ======================= CH4 ======================= -->
+  <section class="chapter ch4" id="ch4">
+    <div class="chapter-header">
+      <span class="ch-num">CHAPTER 04</span>
+      <h2>ER → 關聯式模型 轉換規則</h2>
+    </div>
+
+    <div class="callout callout-exam">
+      <span class="callout-icon">⭐</span>
+      <div>轉換規則（Rule 1~8）是超級重要的考題！要記住每個 Rule 對應什麼情況，以及如何決定 Primary Key 和 Foreign Key。</div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">1️⃣</span>Rule 1：Regular Entity Type（強實體）</h3>
+      <ul>
+        <li>建立一個 Relation，包含所有 <strong>single-valued, simple</strong> 屬性（composite 屬性取其 components）</li>
+        <li>Primary Key = Entity Type 的 Key Attribute</li>
+        <li><strong>Multi-valued 屬性另外用 Rule 8 處理</strong></li>
+      </ul>
+      <pre>Student(SSN, FName, LName, Address)</pre>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">2️⃣</span>Rule 2：Weak Entity Type（弱實體）</h3>
+      <ul>
+        <li>建立 Relation，包含所有 single-valued, simple 屬性</li>
+        <li><strong>複製 Owner Entity 的 PK 作為 FK</strong></li>
+        <li>Primary Key = <em>Owner Entity PK + Partial Key（部分鍵）</em></li>
+      </ul>
+      <pre>Dependent(SSN, Name, Gender, Relation)
+-- SSN 是 FK，引用 Instructor</pre>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">3️⃣</span>Rule 3：1:1 Association Relationship</h3>
+      <ul>
+        <li>選擇一個 Entity（設為 S），將另一個 Entity（T）的 PK 加進 S 的 Relation 作為 FK</li>
+        <li>把 Relationship 的 single-valued 屬性也加到 S</li>
+        <li>FK 放哪邊都可以，<strong>通常放在 Total Participation（完全參與）那邊</strong></li>
+      </ul>
+      <pre>-- 選項一：
+Department(DNumber, DName, MgrSSN, StartDate)
+Manager(SSN, Salary)  -- MgrSSN 是 FK → Manager
+
+-- 選項二：
+Department(DNumber, DName)
+Manager(SSN, Salary, DNumberManaged, StartDate)  -- DNumberManaged 是 FK → Department</pre>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">4️⃣</span>Rule 4：1:M Association Relationship</h3>
+      <ul>
+        <li>將 <strong>「1」那端 Entity 的 PK</strong> 複製到 <strong>「M」那端的 Relation</strong> 當 FK</li>
+        <li>Relationship 的屬性也加到「M」那端</li>
+      </ul>
+      <pre>Department(DNumber, DName)
+Employee(SSN, EName, DNumber, StartDate)
+-- DNumber 是 FK → Department（因為 Employee 是 M 那端）</pre>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">5️⃣</span>Rule 5：M:M Association Relationship</h3>
+      <ul>
+        <li><strong>新建一個 Relation</strong> 代表此 Relationship</li>
+        <li>把兩端 Entity 的 PK 都作為 FK 加入新 Relation</li>
+        <li>新 Relation 的 PK = 兩個 FK 的組合（加上 Relationship 的 key attributes）</li>
+        <li>Relationship 的屬性也加入</li>
+      </ul>
+      <pre>Employee(SSN, EName)
+Project(PNumber, PName)
+Works-On(SSN, PNumber, Hours)
+-- SSN 和 PNumber 都是 FK，合起來是 PK</pre>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">6️⃣</span>Rule 6：N-ary Relationship（N &gt; 2）</h3>
+      <ul>
+        <li>新建一個 Relation</li>
+        <li>把所有參與 Entity 的 PK 作為 FK 加入</li>
+        <li>PK = 所有 FK 的組合（但如果某端 maximal cardinality = 1，那端的 FK 不用放進 PK）</li>
+      </ul>
+      <pre>Work-on(S-SSN, A-SSN, Title)
+-- 如果 Student 端 maximal cardinality = 1，PK = (A-SSN, Title)
+-- 否則 PK = (S-SSN, A-SSN, Title)</pre>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">7️⃣</span>Rule 7：Specialization（IS-A 關係）→ 四種選項</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>選項</th><th>作法</th><th>適合情況</th></tr>
+          <tr>
+            <td><strong>Option A</strong></td>
+            <td>Superclass + 每個 Subclass 各有一個 Relation，Subclass 複製 Superclass PK 作 FK</td>
+            <td>任何情況（最通用）</td>
+          </tr>
+          <tr>
+            <td><strong>Option B</strong></td>
+            <td>只有 Subclass 有 Relation，Superclass 屬性複製到每個 Subclass，刪除 Superclass Relation</td>
+            <td>Disjoint + Total（不能有只屬於 Superclass 的 entity）</td>
+          </tr>
+          <tr>
+            <td><strong>Option C-1</strong></td>
+            <td>只有 Superclass 有 Relation，加入 Type 屬性（表示屬於哪個 Subclass），刪除 Subclass Relation</td>
+            <td>Disjoint（排斥）子類</td>
+          </tr>
+          <tr>
+            <td><strong>Option C-2</strong></td>
+            <td>只有 Superclass 有 Relation，加入 m 個 Boolean 屬性（t1…tm）</td>
+            <td>Overlapping（重疊）子類</td>
+          </tr>
+        </table>
+      </div>
+      <div class="callout callout-warn" style="margin-top:12px">
+        <span class="callout-icon">⚠️</span>
+        <div>Option C-1 的 Type 屬性：若 Completeness = Total → Type 不可為 NULL；若 Partial → 可為 NULL</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">8️⃣</span>Rule 8：Multi-valued Attribute（多值屬性）</h3>
+      <ul>
+        <li>為此屬性建立一個新的 Relation</li>
+        <li>包含：多值屬性 + 原 Entity 的 PK（作為 FK）</li>
+        <li>新 Relation 的 PK = 多值屬性 + FK 的組合</li>
+      </ul>
+      <pre>Student(SSN, ..., Address)
+Student-Phone(SSN, Phone)  -- SSN 是 FK，PK 是 (SSN, Phone)</pre>
+    </div>
+  </section>
+
+
+  <!-- ======================= CH5 ======================= -->
+  <section class="chapter" style="--bar-color: #7c6af7" id="ch5">
+    <div class="chapter-header">
+      <span class="ch-num" style="color: var(--accent)">CHAPTER 05</span>
+      <h2 style="color: var(--text)">正規化 (Normalization)</h2>
+    </div>
+
+    <style>
+      #ch5 .card::before { background: var(--accent); }
+    </style>
+
+    <div class="card">
+      <h3><span class="icon">🎯</span>正規化的目標</h3>
+      <ul>
+        <li>消除 <strong>Data Redundancy（資料重複）</strong></li>
+        <li>避免 <strong>Modification Anomalies（修改異常）</strong>：
+          <ul>
+            <li><em>Insertion Anomaly</em>：新增資料時發生問題</li>
+            <li><em>Deletion Anomaly</em>：刪除資料時意外損失其他資料</li>
+            <li><em>Update Anomaly</em>：更新一筆資料但忘記更新其他重複的</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">→</span>函數相依 (Functional Dependency, FD)</h3>
+      <div class="def">
+        <div class="label">定義</div>
+        <code>X → Y</code> 表示「X functionally determines Y」，即當兩個 tuple 的 X 值相同，Y 值一定也相同。<br>
+        X = 左手邊（Determinant）；Y = 右手邊
+      </div>
+      <div style="margin-top:14px">
+        <strong>Armstrong Axioms（推導規則）</strong>
+        <pre>Reflexivity:   若 Y ⊆ X, 則 X → Y
+Augmentation:  若 X → Y, 則 X,Z → Y,Z
+Transitive:    若 X → Y 且 Y → Z, 則 X → Z
+Decomposition: 若 X → Y,Z, 則 X → Y 且 X → Z
+Union:         若 X → Y 且 X → Z, 則 X → Y,Z
+Pseudotransitive: 若 X → Y 且 W,Y → Z, 則 W,X → Z</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">📊</span>各階正規化一覽</h3>
+      <div class="nf-stack">
+        <div class="nf-row">
+          <span class="nf-badge nf-1">1NF</span>
+          <span class="nf-arrow">→</span>
+          <span class="nf-desc">消除多值屬性和複合屬性，所有值都是<strong>原子值（atomic）</strong></span>
+        </div>
+        <div class="nf-row">
+          <span class="nf-badge nf-2">2NF</span>
+          <span class="nf-arrow">→</span>
+          <span class="nf-desc">在 1NF 基礎上，消除<strong>Partial FD（部分相依）</strong>：非 key 屬性必須完全相依於整個 Primary Key</span>
+        </div>
+        <div class="nf-row">
+          <span class="nf-badge nf-3">3NF</span>
+          <span class="nf-arrow">→</span>
+          <span class="nf-desc">在 2NF 基礎上，消除<strong>Transitive FD（遞移相依）</strong>：非 key 屬性不能傳遞相依於 Primary Key</span>
+        </div>
+        <div class="nf-row">
+          <span class="nf-badge nf-bcnf">BCNF</span>
+          <span class="nf-arrow">→</span>
+          <span class="nf-desc">比 3NF 更嚴：<strong>所有屬性（包括 key 屬性）</strong>都不能傳遞相依於 PK</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">🧩</span>Full vs Partial FD</h3>
+      <div class="grid2">
+        <div class="def">
+          <div class="label">Full FD（完全函數相依）</div>
+          <code>X → Y</code> 且 X 的任何 proper subset 都無法 determine Y
+          <p style="margin-top:6px; font-size:13px">例：<code>SSN, P# → Hours</code> 是 Full FD（光靠 SSN 或 P# 都不夠）</p>
+        </div>
+        <div class="def">
+          <div class="label">Partial FD（部分函數相依）</div>
+          <code>X → Y</code> 且 X 的某個 proper subset 也能 determine Y
+          <p style="margin-top:6px; font-size:13px">例：<code>SSN, P# → PName</code> 是 Partial FD（因為 <code>P# → PName</code> 就夠了）</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">🔄</span>Transitive FD（遞移函數相依）</h3>
+      <div class="def">
+        <div class="label">定義</div>
+        如果 <code>X → Z</code>，且存在 Z 滿足：<br>
+        (1) Z 不是 candidate key，也不是 PK 的 subset<br>
+        (2) <code>X → Z</code> 且 <code>Z → Y</code> 都成立<br>
+        → 則 <code>X → Y</code> 是 Transitive FD
+      </div>
+      <p style="font-size:13px; margin-top:10px">例：<code>Works-For(SSN, D#, DPhone)</code>，其中 <code>SSN → D#</code> 且 <code>D# → DPhone</code><br>
+      → <code>SSN → DPhone</code> 是 Transitive FD（通過 D# 傳遞）</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">⚡</span>2NF 正規化步驟</h3>
+      <div class="callout callout-warn">
+        <span class="callout-icon">⚠️</span>
+        <div>如果 Relation 的 PK 只有一個屬性（非複合主鍵），它一定自動在 2NF！只有<strong>複合主鍵</strong>才需要考慮 2NF。</div>
+      </div>
+      <div class="rule-box">
+        <div class="rule-title">步驟</div>
+        1. 找出所有 Partial FD（非 key 屬性相依於 PK 的某個 proper subset）<br>
+        2. 對每個 Partial FD，建立新的 Relation，把 partial key 的 determinant 當 PK<br>
+        3. 原 Relation 保留完整 PK + 完全相依的屬性，移除 partial dependency 的屬性
+      </div>
+      <pre>Works-on(SSN, P#, Hours, PName)
+-- P# → PName 是 Partial FD
+
+2NF 後：
+Works-On(SSN, P#, Hours)   -- PK = (SSN, P#)
+Project(P#, PName)         -- PK = P#</pre>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">⚡</span>3NF 正規化步驟</h3>
+      <div class="rule-box">
+        <div class="rule-title">步驟</div>
+        1. 找出所有 Transitive FD<br>
+        2. 把中間的 determinant（Z）提出來建立新 Relation，Z 作為新 Relation 的 PK<br>
+        3. 原 Relation 保留 X 和 Z（Z 變成 FK），移除 Y
+      </div>
+      <pre>Works-For(SSN, D#, DPhone)
+-- SSN → D# → DPhone 是 Transitive FD
+
+3NF 後：
+Works-For(SSN, D#)               -- D# 是 FK → Department-Phone
+Department-Phone(D#, DPhone)     -- PK = D#</pre>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">⚡</span>BCNF 正規化</h3>
+      <div class="def">
+        <div class="label">定義 vs 3NF 的差別</div>
+        3NF：只有<strong>非 key 屬性</strong>不能 transitively depend on PK<br>
+        BCNF：<strong>所有屬性</strong>（包括 key 屬性本身）都不能 transitively depend on PK
+      </div>
+      <pre>-- 例：R(A, B, C)，FDs: A,B → C  和  C → B
+-- 主鍵 A,B。但 C → B 中，C 不是 candidate key → 違反 BCNF
+
+BCNF 後：
+R1(C, B)   -- PK = C
+R2(A, C)   -- PK = A（C 是 FK）</pre>
+      <div class="callout callout-warn" style="margin-top:10px">
+        <span class="callout-icon">⚠️</span>
+        <div>BCNF 分解後要小心：某些 BCNF 分解會產生 <strong>Spurious Tuples（假資料）</strong>！要確認用正確的 decomposition。</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">🎓</span>經典範例：Course-Taking 完整流程</h3>
+      <div class="def">
+        <div class="label">原始 Relation</div>
+        <code>Course-Taking(S-SSN, S-Name, C#, C-Name, I-SSN, I-Name, Grade)</code><br>
+        PK = <code>(S-SSN, C#)</code>
+      </div>
+      <div style="margin-top:12px">
+        <strong>已知 FDs：</strong>
+        <pre>S-SSN, C# → S-Name, C-Name, I-SSN, I-Name, Grade（全部）
+S-SSN → S-Name
+C# → C-Name, I-SSN
+I-SSN → I-Name</pre>
+      </div>
+      <div style="margin-top:12px">
+        <strong>1NF ✅</strong>（所有值都是原子的）
+      </div>
+      <div style="margin-top:8px">
+        <strong>2NF 正規化</strong>（消除 Partial FD）：<br>
+        <code>S-SSN → S-Name</code> 是 Partial FD（只靠 S-SSN 就決定了）<br>
+        <code>C# → C-Name, I-SSN, I-Name</code> 是 Partial FD
+        <pre>Student(S-SSN, S-Name)
+Course-Taking(S-SSN, C#, Grade)
+Course-Teaching(C#, C-Name, I-SSN, I-Name)</pre>
+      </div>
+      <div style="margin-top:8px">
+        <strong>3NF 正規化</strong>（消除 Transitive FD）：<br>
+        在 Course-Teaching 中：<code>C# → I-SSN → I-Name</code> 是 Transitive FD
+        <pre>Course-Teaching(C#, C-Name, I-SSN)   -- I-SSN 是 FK
+Instructor(I-SSN, I-Name)</pre>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ======================= CH6 EXAM ======================= -->
+  <section class="chapter" id="ch6">
+    <div class="chapter-header">
+      <span class="ch-num" style="color: var(--accent4)">CHAPTER 06</span>
+      <h2 style="color: var(--text)">考古題類型整理 &amp; 解題技巧</h2>
+    </div>
+    <style>#ch6 .card::before { background: var(--accent4); }</style>
+
+    <div class="card">
+      <h3><span class="icon">📝</span>ERD 繪製題型 — 解題步驟</h3>
+      <div class="rule-box">
+        <div class="rule-title">標準解題流程</div>
+        1. <strong>列出所有 Entity Type</strong>：名詞通常是 entity<br>
+        2. <strong>找屬性</strong>：看哪些屬性有唯一性（→ Key）、多值性（→ multi-valued）<br>
+        3. <strong>找 Relationship</strong>：動詞通常是 relationship（訂購、參與、管理…）<br>
+        4. <strong>標記 Cardinality</strong>：看題目「一位 X 最多/最少對應幾個 Y」<br>
+        5. <strong>找 Weak Entity</strong>：有沒有「屬於某個 entity，沒有獨立的 key」<br>
+        6. <strong>找 Specialization</strong>：有沒有「可分類」的 entity（IS-A 關係）
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">🩺</span>常見 ERD 題目整理</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>題目</th><th>重點 Entity</th><th>特別注意</th></tr>
+          <tr>
+            <td>Exercise #1 外送餐食系統</td>
+            <td>Employee, Store, FoodItem, Order, Deposit</td>
+            <td>FoodItem 是 Weak Entity（對同一家 Store，fName 唯一；但不同 Store 可能重複）</td>
+          </tr>
+          <tr>
+            <td>Exercise #2 課程資料庫</td>
+            <td>Course, Teacher, Student, Item</td>
+            <td>Item 是 Weak Entity（對同一 Course，iName 唯一）；M:M 的 Takes, Teaches</td>
+          </tr>
+          <tr>
+            <td>Exercise #3 拍賣網站</td>
+            <td>Member, Merchandise, Category, Bid</td>
+            <td>Merchandise 是 Weak Entity（seqNo 在同一 Member 下唯一）；Category 有 IsParent 自我關係</td>
+          </tr>
+          <tr>
+            <td>Exercise #4 醫院掛號</td>
+            <td>Department, Doctor, DiagnosisTime, Patient</td>
+            <td>DiagnosisTime 是 Weak Entity（開始時間在同一 Doctor 下唯一）</td>
+          </tr>
+          <tr>
+            <td>Exercise #5 擴充掛號+住院</td>
+            <td>+ChiefDoc, AttendingDoc, Resident, Inpatient, Room</td>
+            <td>Doctor IS-A 特化（Disjoint + Total）；Inpatient IS-A Patient；Occupies Room</td>
+          </tr>
+          <tr>
+            <td>Exercise #6 ERD 工具軟體</td>
+            <td>EntityType, WeakEntityType, RelationshipType, Attribute</td>
+            <td>這題很特別——要用 ERD 描述 ERD 本身！複合屬性的 Composes 關係</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">⚙️</span>Relational Transformation 題型</h3>
+      <div class="callout callout-tip">
+        <span class="callout-icon">💡</span>
+        <div>拿到 ERD，<strong>按 Rule 1→2→3→4→5→6→7→8 依序處理</strong>，不要跳過任何一種 Entity/Relationship Type。</div>
+      </div>
+      <strong>常見陷阱：</strong>
+      <ul style="margin-top:8px">
+        <li>Weak Entity 的 PK 一定是 <strong>Owner PK + Partial Key</strong>，不要忘記</li>
+        <li>1:1 的 FK 放哪邊都可以，但要說明你的選擇</li>
+        <li>Multi-valued 屬性<strong>一定要</strong>另建 Relation（Rule 8）</li>
+        <li>Specialization Option B 只能用在 Disjoint 子類（不然一個 entity 可能要出現在多個 relation）</li>
+        <li>BCNF 的例子：注意 Spurious Tuples 問題</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">📐</span>Normalization 題型解題步驟</h3>
+      <div class="rule-box">
+        <div class="rule-title">萬用流程</div>
+        1. 確認 Primary Key<br>
+        2. 列出所有 FD<br>
+        3. <strong>1NF 檢查</strong>：有沒有多值或複合屬性？<br>
+        4. <strong>2NF 檢查</strong>：PK 是不是複合的？有沒有 Partial FD？<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;→ 有 → 分解，把 partial determinant 拉出去建新表<br>
+        5. <strong>3NF 檢查</strong>：有沒有 Transitive FD（non-key → non-key）？<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;→ 有 → 分解，把中間的 Z 拉出去建新表<br>
+        6. <strong>BCNF 檢查</strong>：有沒有 determinant 不是 candidate key？<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;→ 有 → 分解，注意 lossless decomposition
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="icon">🧠</span>容易混淆的概念整理</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>概念</th><th>容易搞混的點</th></tr>
+          <tr>
+            <td>Weak Entity vs Strong Entity</td>
+            <td>Weak = 沒有自己的 Key（不是「沒有屬性」）；一定要有 Identifying Relationship</td>
+          </tr>
+          <tr>
+            <td>Partial Key vs Primary Key</td>
+            <td>Partial Key 本身不夠識別，要加上 Owner 的 PK 才夠</td>
+          </tr>
+          <tr>
+            <td>Partial FD vs Transitive FD</td>
+            <td>Partial FD = 左邊是 PK 的子集；Transitive FD = 中間有 non-key 屬性</td>
+          </tr>
+          <tr>
+            <td>3NF vs BCNF</td>
+            <td>3NF 允許 non-key 屬性 determine another non-key，只要不 transitively depend on PK；BCNF 連這個都不允許</td>
+          </tr>
+          <tr>
+            <td>Logical vs Physical Data Independence</td>
+            <td>Logical = 改 Conceptual 不影響 External；Physical = 改 Internal 不影響 Conceptual</td>
+          </tr>
+          <tr>
+            <td>Domain vs Schema</td>
+            <td>Domain = 屬性的合法值的集合；Schema = 資料庫的結構描述（Metadata）</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div style="text-align:center; color: var(--text-muted); font-size:12px; font-family: 'JetBrains Mono', monospace; padding: 40px 0 20px; border-top: 1px solid var(--border); margin-top: 40px;">
+    Database Systems · National Chiayi University · 祝考試順利 🎉
+  </div>
+
+</div>
+</body>
+</html>
